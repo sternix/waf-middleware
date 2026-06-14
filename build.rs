@@ -1,29 +1,36 @@
-use std::path::Path;
 use std::fs;
+use std::path::Path;
 
 fn main() {
-    println!("cargo:rerun-if-changed=src/rules");
+    //println!("cargo:rerun-if-changed=src/rules");
 
     generate_waf_rules();
 }
 
 fn generate_waf_rules() {
-    let out_dir = std::env::var("OUT_DIR").unwrap();
-    let dest_path = Path::new(&out_dir).join("waf_rules_generated.rs");
-    
+    let dest_path = Path::new(env!("CARGO_MANIFEST_DIR")).join("waf_rules_generated.rs");
+
     let waf_rules_dir = Path::new("src/rules");
+    /*
     if !waf_rules_dir.exists() {
-        fs::write(&dest_path, "pub static GENERATED_CRS_RULES: &[(&str, &str)] = &[];").unwrap();
+        fs::write(
+            &dest_path,
+            "pub static GENERATED_CRS_RULES: &[(&str, &str)] = &[];",
+        )
+        .unwrap();
         return;
     }
+     */
 
-    let mut generated_code = String::from("pub static GENERATED_CRS_RULES: &[(&str, &str, u8)] = &[\n");
+    let mut generated_code =
+        String::from("pub static GENERATED_CRS_RULES: &[(&str, &str, u8)] = &[\n");
 
-    let mut entries: Vec<_> = fs::read_dir(waf_rules_dir).unwrap()
+    let mut entries: Vec<_> = fs::read_dir(waf_rules_dir)
+        .unwrap()
         .map(|res| res.unwrap().path())
         .filter(|path| path.extension().map_or(false, |ext| ext == "conf"))
         .collect();
-    
+
     // Sort for deterministic build
     entries.sort();
 
@@ -33,7 +40,10 @@ fn generate_waf_rules() {
         for (id, regex, paranoia_level) in rules {
             // Escape backslashes for Rust string literal
             let escaped_regex = regex.replace('\\', "\\\\").replace('"', "\\\"");
-            generated_code.push_str(&format!("    (\"{}\", \"{}\", {}),\n", id, escaped_regex, paranoia_level));
+            generated_code.push_str(&format!(
+                "    (\"{}\", \"{}\", {}),\n",
+                id, escaped_regex, paranoia_level
+            ));
         }
     }
 
@@ -80,7 +90,10 @@ fn process_rule_buffer(buffer: &str) -> Option<(String, String, u8)> {
     let mut current_id = String::new();
     if let Some(id_start) = buffer.find("id:") {
         let id_part = &buffer[id_start + 3..];
-        current_id = id_part.chars().take_while(|c| c.is_digit(10)).collect::<String>();
+        current_id = id_part
+            .chars()
+            .take_while(|c| c.is_digit(10))
+            .collect::<String>();
     }
 
     if current_id.is_empty() {
@@ -145,7 +158,7 @@ fn process_rule_buffer(buffer: &str) -> Option<(String, String, u8)> {
 
             return Some((current_id, final_regex, paranoia_level));
         }
-        
+
         if op_content.contains("@detectSQLi") {
             let sql_regex = r#"(?i)(?:(?:\'|\")\s*(?:OR|AND|UNION|SELECT|INSERT|UPDATE|DELETE|DROP|--|;)|(?:\'|\")\s*\d+\s*=\s*\d+|\b(?:union|select|insert|update|delete|drop|alter|create|truncate|exec|xp_cmdshell|benchmark|sleep)\b|;\s*\b(?:select|insert|update|delete|drop|union)\b)"#;
             return Some((current_id, sql_regex.to_string(), paranoia_level));

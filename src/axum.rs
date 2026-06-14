@@ -3,7 +3,7 @@ use crate::engine::WafEngine;
 use axum::{
     body::Body,
     extract::Request,
-    http::{header, StatusCode},
+    http::{StatusCode, header},
     middleware::Next,
     response::Response,
 };

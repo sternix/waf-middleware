@@ -10,16 +10,16 @@
 # See Cargo.toml.orig for the original contents.
 
 [package]
-edition = "2021"
+edition = "2024"
 name = "waf-middleware"
 version = "0.1.2"
 authors = ["Samir Djelal <ssdjelal@gmail.com>"]
 build = "build.rs"
-autolib = false
-autobins = false
-autoexamples = false
-autotests = false
-autobenches = false
+#autolib = false
+#autobins = false
+#autoexamples = false
+#autotests = false
+#autobenches = false
 description = "A high-performance Web Application Firewall (WAF) middleware for Rust web frameworks like Axum and Actix-web, powered by OWASP Core Rule Set patterns."
 homepage = "https://github.com/samirdjelal/waf-middleware"
 documentation = "https://github.com/samirdjelal/waf-middleware/blob/main/README.md"
@@ -72,9 +72,6 @@ version = "0.3"
 
 [dependencies.http]
 version = "1.0"
-
-[dependencies.once_cell]
-version = "1.19"
 
 [dependencies.pin-project-lite]
 version = "0.2"

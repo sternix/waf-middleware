@@ -1741,7 +1741,6 @@ dependencies = [
  "fancy-regex",
  "futures-util",
  "http 1.4.1",
- "once_cell",
  "pin-project-lite",
  "regex",
  "serde",

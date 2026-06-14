@@ -1,12 +1,12 @@
 use crate::config::WafConfig;
 use crate::engine::WafEngine;
 use actix_web::{
+    Error, HttpResponse,
     body::{BoxBody, EitherBody},
     dev::{Service, ServiceRequest, ServiceResponse, Transform},
-    Error, HttpResponse,
 };
-use futures_util::future::{ok, Ready};
 use futures_util::FutureExt;
+use futures_util::future::{Ready, ok};
 use std::collections::HashMap;
 use std::rc::Rc;
 use std::sync::Arc;
